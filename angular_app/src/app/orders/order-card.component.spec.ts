@@ -1,0 +1,3 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { OrderCardComponent } from './order-card.component';
+describe('OrderCardComponent', () => { let fixture: ComponentFixture<OrderCardComponent>; beforeEach(async () => { await TestBed.configureTestingModule({ imports: [OrderCardComponent] }).compileComponents(); fixture = TestBed.createComponent(OrderCardComponent); fixture.componentRef.setInput('order', { id: 4, userId: 7, products: [], total: 80, discountedTotal: 70, totalProducts: 0, totalQuantity: 0 }); fixture.detectChanges(); }); it('renders the order id and total', () => { expect(fixture.nativeElement.textContent).toContain('Pedido #4'); expect(fixture.nativeElement.textContent).toContain('$80.00'); }); });

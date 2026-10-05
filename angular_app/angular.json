@@ -1,0 +1,6 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "projects": { "orders-panel": { "projectType": "application", "root": "", "sourceRoot": "src", "prefix": "app", "architect": { "build": { "builder": "@angular/build:application", "options": { "outputPath": "dist/orders-panel", "index": "src/index.html", "browser": "src/main.ts", "tsConfig": "tsconfig.app.json", "assets": [], "styles": ["src/styles.css"] } }, "serve": { "builder": "@angular/build:dev-server", "configurations": { "development": { "buildTarget": "orders-panel:build" } }, "defaultConfiguration": "development" }, "test": { "builder": "@angular/build:karma", "options": { "tsConfig": "tsconfig.spec.json", "polyfills": ["zone.js", "zone.js/testing"] } } } } },
+  "cli": { "analytics": false }
+}
