@@ -13,7 +13,7 @@ class ProductsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final products = ref.watch(productsProvider);
-    final isCompact = MediaQuery.sizeOf(context).width < 360;
+    final isCompact = MediaQuery.sizeOf(context).width < 600;
 
     return Scaffold(
       appBar: AppBar(

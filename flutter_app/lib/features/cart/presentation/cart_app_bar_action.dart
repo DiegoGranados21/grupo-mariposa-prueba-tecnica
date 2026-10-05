@@ -21,17 +21,49 @@ class CartAppBarAction extends ConsumerWidget {
       button: true,
       enabled: !isCurrentPage,
       label: label,
-      child: IconButton(
-        tooltip: 'Carrito ($count)',
-        color: Colors.white,
-        disabledColor: Colors.white,
-        onPressed: isCurrentPage ? null : () => context.push('/cart'),
-        icon: Badge.count(
-          count: count,
-          isLabelVisible: count > 0,
-          backgroundColor: const Color(0xFFB91C1C),
-          textColor: Colors.white,
-          child: const Icon(Icons.shopping_cart_outlined),
+      child: Tooltip(
+        message: 'Carrito ($count)',
+        child: InkResponse(
+          onTap: isCurrentPage ? null : () => context.push('/cart'),
+          radius: 28,
+          child: SizedBox(
+            width: 56,
+            height: kToolbarHeight,
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(
+                  Icons.shopping_cart,
+                  color: Colors.white,
+                  size: 30,
+                ),
+                if (count > 0)
+                  Positioned(
+                    top: 7,
+                    right: 5,
+                    child: Container(
+                      constraints:
+                          const BoxConstraints(minWidth: 20, minHeight: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFB91C1C),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '$count',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
