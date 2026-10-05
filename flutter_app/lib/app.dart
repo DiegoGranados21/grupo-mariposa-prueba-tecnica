@@ -31,3 +31,4 @@ class CatalogApp extends ConsumerWidget {
           floatingActionButton: const CartSummaryButton(),
         ),
       );
+}

@@ -15,3 +15,6 @@ angular_app/.angular/
 .vscode/
 *.iml
 .DS_Store
+
+# Local verification logs and temporary files
+work/
