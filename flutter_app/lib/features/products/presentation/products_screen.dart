@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme_provider.dart';
+import '../../cart/presentation/cart_app_bar_action.dart';
 import '../../cart/presentation/cart_provider.dart';
 import 'products_providers.dart';
 
@@ -21,6 +22,7 @@ class ProductsScreen extends ConsumerWidget {
             icon: const Icon(Icons.brightness_6),
             onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
           ),
+          const CartAppBarAction(),
         ],
       ),
       body: Column(
@@ -67,7 +69,7 @@ class ProductsScreen extends ConsumerWidget {
                         '\$${product.price.toStringAsFixed(2)} · '
                         '★ ${product.rating.toStringAsFixed(1)}',
                       ),
-                      onTap: () => context.go('/products/${product.id}'),
+                      onTap: () => context.push('/products/${product.id}'),
                       trailing: IconButton(
                         icon: const Icon(Icons.add_shopping_cart),
                         onPressed: () =>

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../cart/presentation/cart_provider.dart';
+import '../../cart/presentation/cart_app_bar_action.dart';
 import 'products_providers.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
@@ -14,7 +15,10 @@ class ProductDetailScreen extends ConsumerWidget {
     final product = ref.watch(productDetailProvider(id));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalle')),
+      appBar: AppBar(
+        title: const Text('Detalle'),
+        actions: const [CartAppBarAction()],
+      ),
       body: product.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text('$error')),

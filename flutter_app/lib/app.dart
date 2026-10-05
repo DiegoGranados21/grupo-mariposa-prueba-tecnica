@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import 'core/theme_provider.dart';
 import 'features/cart/presentation/cart_screen.dart';
-import 'features/cart/presentation/cart_summary_button.dart';
 import 'features/products/presentation/product_detail_screen.dart';
 import 'features/products/presentation/products_screen.dart';
 
@@ -26,9 +25,6 @@ class CatalogApp extends ConsumerWidget {
         theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
         darkTheme: ThemeData(colorSchemeSeed: Colors.indigo, brightness: Brightness.dark, useMaterial3: true),
         routerConfig: ref.watch(routerProvider),
-        builder: (context, child) => Scaffold(
-          body: child,
-          floatingActionButton: const CartSummaryButton(),
-        ),
+        builder: (context, child) => child ?? const SizedBox.shrink(),
       );
 }
