@@ -13,16 +13,19 @@ class ProductsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final products = ref.watch(productsProvider);
+    final isCompact = MediaQuery.sizeOf(context).width < 360;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mini Catálogo'),
+        title: Text(isCompact ? 'Catálogo' : 'Mini Catálogo'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.brightness_6),
-            onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
-          ),
           const CartAppBarAction(),
+          if (!isCompact)
+            IconButton(
+              tooltip: 'Cambiar tema',
+              onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
+              icon: const Icon(Icons.brightness_6),
+            ),
         ],
       ),
       body: Column(
@@ -49,7 +52,8 @@ class ProductsScreen extends ConsumerWidget {
               ),
               data: (items) {
                 if (items.isEmpty) {
-                  return const Center(child: Text('No se encontraron productos'));
+                  return const Center(
+                      child: Text('No se encontraron productos'));
                 }
                 return ListView.builder(
                   itemCount: items.length,
