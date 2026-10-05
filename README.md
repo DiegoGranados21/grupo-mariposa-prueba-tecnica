@@ -15,11 +15,13 @@ Se usó Riverpod sin generación de código para que la solución sea fácil de 
 
 La búsqueda espera 400 ms antes de consultar. La pantalla de detalle usa una familia de providers indexada por `id`. `go_router` mantiene las rutas declaradas. También se incluyó un provider de tema, como mejora pequeña y aislada.
 
+La interfaz cuida contraste en la barra de navegación, textos alternativos para imágenes relevantes, etiquetas semánticas en el carrito y controles con áreas de toque cómodas. Son prácticas alineadas con WCAG, sin declarar una certificación formal.
+
 ### Angular
 
 `OrdersService` encapsula `HttpClient` y devuelve datos tipados. `OrdersPageComponent` es el contenedor: carga, filtra y navega. `OrderCardComponent` solo recibe un pedido y emite la intención de verlo. El filtro combina `FormControl` con Signals y la plantilla usa `@if` / `@for`. El `async` pipe se encarga de la suscripción HTTP y evita fugas de memoria.
 
-Un paralelo útil: el servicio de Angular cumple un papel parecido al repositorio de Flutter; un componente presentacional se parece a un widget sin estado; y un `Signal` representa estado reactivo de forma parecida a un provider simple.
+Un paralelo útil: el servicio de Angular cumple un papel parecido al repositorio de Flutter; un componente presentacional se parece a un widget sin estado; y un `Signal` representa estado reactivo de forma parecida a un provider simple. La ruta `/orders/:id` se carga de forma diferida para consultar el detalle de un pedido.
 
 ## Ejecutar
 
@@ -52,8 +54,8 @@ Luego abrir `http://localhost:4200`.
 
 - Paginación infinita y filtro por categoría en Flutter.
 - Persistencia del carrito en almacenamiento local.
-- Prueba de integración Flutter y automatización CI.
-- Ruta de detalle Angular con carga diferida y un pipe de moneda propio.
+- Prueba de integración Flutter.
+- Un pipe propio para mostrar moneda o descuentos.
 
 ## Checklist de entrega
 
@@ -62,3 +64,4 @@ Luego abrir `http://localhost:4200`.
 - [x] Tres pruebas unitarias y una prueba de widget en Flutter.
 - [x] Angular standalone, strict, servicio tipado, filtro y pruebas.
 - [x] Respuestas conceptuales y code review en `RESPUESTAS.md`.
+- [x] Ruta Angular de detalle con carga diferida y verificación continua en GitHub Actions.

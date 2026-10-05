@@ -33,7 +33,8 @@ class ProductsScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(12),
             child: TextField(
-              onChanged: ref.read(productsProvider.notifier).search,
+              onChanged: (query) =>
+                  ref.read(productsProvider.notifier).search(query),
               decoration: const InputDecoration(
                 labelText: 'Buscar productos',
                 prefixIcon: Icon(Icons.search),
@@ -46,7 +47,7 @@ class ProductsScreen extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, _) => Center(
                 child: FilledButton(
-                  onPressed: ref.read(productsProvider.notifier).retry,
+                  onPressed: () => ref.read(productsProvider.notifier).retry(),
                   child: const Text('Reintentar'),
                 ),
               ),
