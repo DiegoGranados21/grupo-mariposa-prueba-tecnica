@@ -13,13 +13,26 @@ class CartAppBarAction extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final count = ref.watch(cartCountProvider);
 
-    return IconButton(
-      tooltip: 'Ver carrito',
-      onPressed: isCurrentPage ? null : () => context.push('/cart'),
-      icon: Badge.count(
-        count: count,
-        isLabelVisible: count > 0,
-        child: const Icon(Icons.shopping_cart_outlined),
+    final label = count == 0
+        ? 'Abrir carrito vacío'
+        : 'Abrir carrito con $count ${count == 1 ? 'artículo' : 'artículos'}';
+
+    return Semantics(
+      button: true,
+      enabled: !isCurrentPage,
+      label: label,
+      child: IconButton(
+        tooltip: 'Carrito ($count)',
+        color: Colors.white,
+        disabledColor: Colors.white,
+        onPressed: isCurrentPage ? null : () => context.push('/cart'),
+        icon: Badge.count(
+          count: count,
+          isLabelVisible: count > 0,
+          backgroundColor: const Color(0xFFB91C1C),
+          textColor: Colors.white,
+          child: const Icon(Icons.shopping_cart_outlined),
+        ),
       ),
     );
   }
