@@ -1,0 +1,17 @@
+# Flutter
+flutter_app/.dart_tool/
+flutter_app/.packages
+flutter_app/build/
+flutter_app/.flutter-plugins
+flutter_app/.flutter-plugins-dependencies
+
+# Angular
+angular_app/node_modules/
+angular_app/dist/
+angular_app/.angular/
+
+# Editors and system files
+.idea/
+.vscode/
+*.iml
+.DS_Store
