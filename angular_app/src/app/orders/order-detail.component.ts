@@ -17,18 +17,20 @@ import { OrdersService } from '../services/orders.service';
       @if (order$ | async; as state) {
         @if (state.error) {
           <p class="error">No se pudo cargar el pedido.</p>
-        } @else if (state.order; as order) {
-          <h1>Pedido #{{ order.id }}</h1>
-          <p>Usuario: {{ order.userId }}</p>
-          <p>Total: <strong>{{ order.total | currency: 'USD' }}</strong></p>
-          <h2>Productos</h2>
-          <ul>
-            @for (product of order.products; track product.id) {
-              <li>{{ product.quantity }} × {{ product.title }}</li>
-            }
-          </ul>
         } @else {
-          <p>Cargando pedido...</p>
+          @if (state.order; as order) {
+            <h1>Pedido #{{ order.id }}</h1>
+            <p>Usuario: {{ order.userId }}</p>
+            <p>Total: <strong>{{ order.total | currency: 'USD' }}</strong></p>
+            <h2>Productos</h2>
+            <ul>
+              @for (product of order.products; track product.id) {
+                <li>{{ product.quantity }} × {{ product.title }}</li>
+              }
+            </ul>
+          } @else {
+            <p>Cargando pedido...</p>
+          }
         }
       }
     </main>
