@@ -35,8 +35,12 @@ jobs:
           cache-dependency-path: angular_app/package-lock.json
       - uses: browser-actions/setup-chrome@v1
         id: chrome
+      - name: Configure Chrome for the GitHub runner
+        run: |
+          wrapper="$RUNNER_TEMP/chrome-no-sandbox"
+          printf '#!/usr/bin/env bash\nexec "%s" --no-sandbox "$@"\n' "${{ steps.chrome.outputs.chrome-path }}" > "$wrapper"
+          chmod +x "$wrapper"
+          echo "CHROME_BIN=$wrapper" >> "$GITHUB_ENV"
       - run: npm ci
       - run: npm run build
       - run: npm test
-        env:
-          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
