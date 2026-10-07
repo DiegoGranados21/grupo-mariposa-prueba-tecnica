@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import 'cart_app_bar_action.dart';
 import 'cart_provider.dart';
+
+final _currencyFormat = NumberFormat.currency(
+  locale: 'en_US',
+  symbol: r'$',
+  decimalDigits: 2,
+);
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
@@ -39,12 +47,13 @@ class CartScreen extends ConsumerWidget {
                               ),
                               title: Text(item.product.title),
                               subtitle: Text(
-                                '\$${item.product.price.toStringAsFixed(2)} c/u\n'
-                                'Subtotal: \$${item.subtotal.toStringAsFixed(2)}',
+                                '${_currencyFormat.format(item.product.price)} c/u\n'
+                                'Subtotal: ${_currencyFormat.format(item.subtotal)}',
                               ),
                               isThreeLine: true,
                             ),
                             _QuantityControls(
+                              inputKey: ValueKey('quantity-${item.product.id}'),
                               quantity: item.quantity,
                               onDecrease: () => ref
                                   .read(cartProvider.notifier)
@@ -58,6 +67,9 @@ class CartScreen extends ConsumerWidget {
                                     item.product.id,
                                     item.quantity + 1,
                                   ),
+                              onQuantityChanged: (quantity) => ref
+                                  .read(cartProvider.notifier)
+                                  .changeQuantity(item.product.id, quantity),
                               onRemove: () => ref
                                   .read(cartProvider.notifier)
                                   .remove(item.product.id),
@@ -80,7 +92,7 @@ class CartScreen extends ConsumerWidget {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          '\$${total.toStringAsFixed(2)}',
+                          _currencyFormat.format(total),
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ],
@@ -127,18 +139,69 @@ class _ProductThumbnail extends StatelessWidget {
   }
 }
 
-class _QuantityControls extends StatelessWidget {
+class _QuantityControls extends StatefulWidget {
   const _QuantityControls({
+    required this.inputKey,
     required this.quantity,
     required this.onDecrease,
     required this.onIncrease,
+    required this.onQuantityChanged,
     required this.onRemove,
   });
 
+  final Key inputKey;
   final int quantity;
   final VoidCallback onDecrease;
   final VoidCallback onIncrease;
+  final ValueChanged<int> onQuantityChanged;
   final VoidCallback onRemove;
+
+  @override
+  State<_QuantityControls> createState() => _QuantityControlsState();
+}
+
+class _QuantityControlsState extends State<_QuantityControls> {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: '${widget.quantity}');
+    _focusNode = FocusNode()..addListener(_restoreInvalidQuantity);
+  }
+
+  @override
+  void didUpdateWidget(covariant _QuantityControls oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final displayedQuantity = int.tryParse(_controller.text);
+    if (displayedQuantity != widget.quantity) {
+      _controller.text = '${widget.quantity}';
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode
+      ..removeListener(_restoreInvalidQuantity)
+      ..dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _restoreInvalidQuantity() {
+    final quantity = int.tryParse(_controller.text);
+    if (!_focusNode.hasFocus && (quantity == null || quantity <= 0)) {
+      _controller.text = '${widget.quantity}';
+    }
+  }
+
+  void _updateQuantity(String value) {
+    final quantity = int.tryParse(value);
+    if (quantity != null && quantity > 0 && quantity != widget.quantity) {
+      widget.onQuantityChanged(quantity);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,24 +211,44 @@ class _QuantityControls extends StatelessWidget {
       children: [
         IconButton(
           tooltip: 'Restar una unidad',
-          onPressed: onDecrease,
+          onPressed: widget.onDecrease,
           icon: const Icon(Icons.remove_circle_outline),
         ),
-        Semantics(
-          label: 'Cantidad: $quantity',
-          child: Text(
-            '$quantity',
-            style: Theme.of(context).textTheme.titleMedium,
+        SizedBox(
+          width: 96,
+          child: TextField(
+            key: widget.inputKey,
+            controller: _controller,
+            focusNode: _focusNode,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            textAlign: TextAlign.center,
+            decoration: const InputDecoration(
+              labelText: 'Cantidad',
+              isDense: true,
+              border: OutlineInputBorder(),
+            ),
+            onTap: () => _controller.selection = TextSelection(
+              baseOffset: 0,
+              extentOffset: _controller.text.length,
+            ),
+            onChanged: _updateQuantity,
+            onSubmitted: (value) {
+              final quantity = int.tryParse(value);
+              if (quantity == null || quantity <= 0) {
+                _controller.text = '${widget.quantity}';
+              }
+            },
           ),
         ),
         IconButton(
           tooltip: 'Sumar una unidad',
-          onPressed: onIncrease,
+          onPressed: widget.onIncrease,
           icon: const Icon(Icons.add_circle_outline),
         ),
         IconButton(
           tooltip: 'Eliminar producto del carrito',
-          onPressed: onRemove,
+          onPressed: widget.onRemove,
           icon: const Icon(Icons.delete_outline),
         ),
       ],
