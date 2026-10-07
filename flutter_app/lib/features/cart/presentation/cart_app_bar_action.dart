@@ -33,18 +33,16 @@ class CartAppBarAction extends ConsumerWidget {
               alignment: Alignment.center,
               clipBehavior: Clip.none,
               children: [
-                const Icon(
-                  Icons.shopping_cart,
-                  color: Colors.white,
-                  size: 30,
-                ),
+                const Icon(Icons.shopping_cart, color: Colors.white, size: 30),
                 if (count > 0)
                   Positioned(
                     top: 7,
                     right: 5,
                     child: Container(
-                      constraints:
-                          const BoxConstraints(minWidth: 20, minHeight: 20),
+                      constraints: const BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       alignment: Alignment.center,
                       decoration: const BoxDecoration(

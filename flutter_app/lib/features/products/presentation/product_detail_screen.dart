@@ -30,7 +30,10 @@ class ProductDetailScreen extends ConsumerWidget {
               if (item.thumbnail.isNotEmpty)
                 Center(child: Image.network(item.thumbnail, height: 180)),
               const SizedBox(height: 16),
-              Text(item.title, style: Theme.of(context).textTheme.headlineSmall),
+              Text(
+                item.title,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
               Text('\$${item.price.toStringAsFixed(2)} · ★ ${item.rating}'),
               const SizedBox(height: 16),
               Text(item.description),

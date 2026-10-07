@@ -29,34 +29,40 @@ class CartScreen extends ConsumerWidget {
                     itemBuilder: (_, index) {
                       final item = items[index];
                       return Card(
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(12),
-                          leading: _ProductThumbnail(
-                            imageUrl: item.product.thumbnail,
-                            title: item.product.title,
-                          ),
-                          title: Text(item.product.title),
-                          subtitle: Text(
-                            '\$${item.product.price.toStringAsFixed(2)} c/u\n'
-                            'Subtotal: \$${item.subtotal.toStringAsFixed(2)}',
-                          ),
-                          isThreeLine: true,
-                          trailing: _QuantityControls(
-                            quantity: item.quantity,
-                            onDecrease: () =>
-                                ref.read(cartProvider.notifier).changeQuantity(
-                                      item.product.id,
-                                      item.quantity - 1,
-                                    ),
-                            onIncrease: () =>
-                                ref.read(cartProvider.notifier).changeQuantity(
-                                      item.product.id,
-                                      item.quantity + 1,
-                                    ),
-                            onRemove: () => ref
-                                .read(cartProvider.notifier)
-                                .remove(item.product.id),
-                          ),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              contentPadding: const EdgeInsets.all(12),
+                              leading: _ProductThumbnail(
+                                imageUrl: item.product.thumbnail,
+                                title: item.product.title,
+                              ),
+                              title: Text(item.product.title),
+                              subtitle: Text(
+                                '\$${item.product.price.toStringAsFixed(2)} c/u\n'
+                                'Subtotal: \$${item.subtotal.toStringAsFixed(2)}',
+                              ),
+                              isThreeLine: true,
+                            ),
+                            _QuantityControls(
+                              quantity: item.quantity,
+                              onDecrease: () => ref
+                                  .read(cartProvider.notifier)
+                                  .changeQuantity(
+                                    item.product.id,
+                                    item.quantity - 1,
+                                  ),
+                              onIncrease: () => ref
+                                  .read(cartProvider.notifier)
+                                  .changeQuantity(
+                                    item.product.id,
+                                    item.quantity + 1,
+                                  ),
+                              onRemove: () => ref
+                                  .read(cartProvider.notifier)
+                                  .remove(item.product.id),
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -69,8 +75,10 @@ class CartScreen extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text(
+                          'Total',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         Text(
                           '\$${total.toStringAsFixed(2)}',
                           style: Theme.of(context).textTheme.titleLarge,
@@ -134,28 +142,26 @@ class _QuantityControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              tooltip: 'Restar una unidad',
-              onPressed: onDecrease,
-              icon: const Icon(Icons.remove_circle_outline),
-            ),
-            Semantics(
-              label: 'Cantidad: $quantity',
-              child: Text('$quantity',
-                  style: Theme.of(context).textTheme.titleMedium),
-            ),
-            IconButton(
-              tooltip: 'Sumar una unidad',
-              onPressed: onIncrease,
-              icon: const Icon(Icons.add_circle_outline),
-            ),
-          ],
+        IconButton(
+          tooltip: 'Restar una unidad',
+          onPressed: onDecrease,
+          icon: const Icon(Icons.remove_circle_outline),
+        ),
+        Semantics(
+          label: 'Cantidad: $quantity',
+          child: Text(
+            '$quantity',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        IconButton(
+          tooltip: 'Sumar una unidad',
+          onPressed: onIncrease,
+          icon: const Icon(Icons.add_circle_outline),
         ),
         IconButton(
           tooltip: 'Eliminar producto del carrito',
