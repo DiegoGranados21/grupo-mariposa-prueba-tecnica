@@ -4,11 +4,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, map, of, switchMap } from 'rxjs';
 
 import { OrdersService } from '../services/orders.service';
+import { DiscountAmountPipe } from './discount-amount.pipe';
 
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [AsyncPipe, CurrencyPipe, RouterLink],
+  imports: [AsyncPipe, CurrencyPipe, DiscountAmountPipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <main>
@@ -22,6 +23,7 @@ import { OrdersService } from '../services/orders.service';
             <h1>Pedido #{{ order.id }}</h1>
             <p>Usuario: {{ order.userId }}</p>
             <p>Total: <strong>{{ order.total | currency: 'USD' }}</strong></p>
+            <p>Ahorro: {{ order.total | discountAmount:order.discountedTotal | currency: 'USD' }}</p>
             <h2>Productos</h2>
             <ul>
               @for (product of order.products; track product.id) {
