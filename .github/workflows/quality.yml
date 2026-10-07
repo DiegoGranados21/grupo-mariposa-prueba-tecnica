@@ -20,6 +20,21 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
+  flutter-integration:
+    name: Flutter integration on Windows
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: flutter_app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter config --enable-windows-desktop
+      - run: flutter pub get
+      - run: flutter test integration_test/catalog_flow_test.dart -d windows
+
   angular:
     name: Angular build and test
     runs-on: ubuntu-latest
