@@ -77,4 +77,13 @@ Referencia: PDF original de siete páginas, fechado 5 de octubre de 2026. Esta m
 
 Las instalaciones limpias usan `flutter pub get` y `npm ci`; no dependen de node_modules, build ni archivos ignorados del equipo del autor. El código generado está versionado. Las pruebas de red usan dobles para evitar flakiness por DummyJSON.
 
+Comprobación realizada el 8 de octubre de 2026 desde archivos extraídos de commits locales, sin copiar `.dart_tool`, `node_modules` ni `build`:
+
+- Flutter: instalación, formato, analyze, 29 tests y los 2 casos de integración Windows aprobados desde una copia independiente.
+- Angular: instalación con `npm ci`, formato, lint, build y 12 tests aprobados desde una copia independiente.
+- La primera comprobación limpia detectó saltos CRLF incompatibles con Prettier. Se corrigió con `.gitattributes` y se repitió la comprobación: pasó. No se exige al entrevistador reformatear archivos después de clonar.
+- Regenerar con build_runner no cambió los `.g.dart` versionados; el formato también pasó.
+- Flutter web release compiló correctamente. Una consulta de humo a DummyJSON confirmó listado/detalle, categorías y pedidos disponibles durante la revisión; no garantiza disponibilidad futura.
+- `npm ci` funciona, pero informa 27 avisos de seguridad en el árbol completo (incluye herramientas de desarrollo). No se ocultaron ni se hizo `audit fix --force`; requieren un análisis de actualización separado antes de producción.
+
 No se promete ausencia absoluta de fallos ni disponibilidad perpetua de DummyJSON. No se verificó Android/iOS: Android necesita licencias aceptadas y iOS un equipo macOS. No se incluyen claves de firma release ni despliegue público. Los avisos de dependencias Angular y las mejoras de producción están documentados, sin forzar una migración fuera del alcance.
