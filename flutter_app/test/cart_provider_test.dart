@@ -12,6 +12,20 @@ void main() {
     rating: 4,
     thumbnail: '',
   );
+  test('updates quantities, derived totals and immutable previous state', () {
+    final c = ProviderContainer();
+    addTearDown(c.dispose);
+    final notifier = c.read(cartProvider.notifier)..add(phone);
+    final previous = c.read(cartProvider);
+    notifier.changeQuantity(1, 50);
+    expect(previous.single.quantity, 1);
+    expect(c.read(cartCountProvider), 50);
+    expect(c.read(cartTotalProvider), 500);
+    expect(() => c.read(cartProvider).clear(), throwsUnsupportedError);
+    notifier.remove(1);
+    expect(c.read(cartCountProvider), 0);
+    expect(c.read(cartTotalProvider), 0);
+  });
   test('adds a new product with quantity one', () {
     final c = ProviderContainer();
     addTearDown(c.dispose);

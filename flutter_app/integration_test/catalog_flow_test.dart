@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -12,6 +13,7 @@ import 'package:grupo_mariposa_catalog/features/products/presentation/products_p
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DemoRepository implements ProductsRepository {
+  String lastQuery = '';
   static const product = Product(
     id: 1,
     title: 'Producto de prueba',
@@ -31,17 +33,22 @@ class DemoRepository implements ProductsRepository {
     String query = '',
     String category = '',
     int skip = 0,
-  }) async => const ProductPage(items: [product], total: 1);
+  }) async {
+    lastQuery = query;
+    final matches = product.title.toLowerCase().contains(query.toLowerCase());
+    return ProductPage(items: matches ? [product] : [], total: matches ? 1 : 0);
+  }
 }
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('catalog to detail to cart flow', (tester) async {
+  testWidgets('search to detail to cart flow', (tester) async {
+    final repository = DemoRepository();
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          productsRepositoryProvider.overrideWithValue(DemoRepository()),
+          productsRepositoryProvider.overrideWithValue(repository),
           cartStorageProvider.overrideWithValue(MemoryCartStorage()),
         ],
         child: const CatalogApp(),
@@ -49,6 +56,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.enterText(find.byType(TextField), 'Producto');
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    expect(repository.lastQuery, 'Producto');
     await tester.tap(find.text('Producto de prueba'));
     await tester.pumpAndSettle();
     expect(find.text('Agregar al carrito'), findsOneWidget);
@@ -59,6 +70,21 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Carrito'), findsOneWidget);
     expect(find.text('\$25.00'), findsOneWidget);
+    await tester.enterText(find.byKey(const ValueKey('quantity-1')), '50');
+    await tester.pumpAndSettle();
+    expect(find.text('\$1,250.00'), findsOneWidget);
+    expect(find.byTooltip('Carrito (50)'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Detalle'), findsOneWidget);
+    expect(find.byTooltip('Carrito (50)'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      'Producto',
+    );
+    expect(find.byTooltip('Carrito (50)'), findsOneWidget);
   });
 
   testWidgets('persists the cart across storage instances', (tester) async {

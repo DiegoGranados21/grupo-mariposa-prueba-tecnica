@@ -28,4 +28,13 @@ describe('OrderCardComponent', () => {
     expect(text).toContain('$80.00');
     expect(text).toContain('Ahorro: $10.00');
   });
+
+  it('emits the order identifier when its accessible detail button is clicked', () => {
+    const emitted: number[] = [];
+    fixture.componentInstance.view.subscribe((id) => emitted.push(id));
+    const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+    expect(button.getAttribute('aria-label')).toContain('4');
+    button.click();
+    expect(emitted).toEqual([4]);
+  });
 });

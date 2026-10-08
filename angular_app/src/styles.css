@@ -1,1 +1,45 @@
-:root { font-family: Arial, sans-serif; color: #172033; background: #f6f7fb; } body { margin: 0; } main { max-width: 900px; margin: auto; padding: 2rem; } input { padding: .65rem; border: 1px solid #c5cbd8; border-radius: .4rem; width: min(100%, 340px); } .orders { display: grid; gap: 1rem; margin-top: 1.5rem; } .card { background: white; border-radius: .6rem; padding: 1rem; box-shadow: 0 1px 3px #0002; } button { padding: .5rem .8rem; border: 0; border-radius: .35rem; background: #4055ad; color: white; cursor: pointer; } .error { color: #a21d2b; }
+:root {
+  font-family: Arial, sans-serif;
+  color: #172033;
+  background: #f6f7fb;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 900px;
+  margin: auto;
+  padding: 2rem;
+}
+input {
+  padding: 0.65rem;
+  border: 1px solid #c5cbd8;
+  border-radius: 0.4rem;
+  width: min(100%, 340px);
+}
+.orders {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.card {
+  background: white;
+  border-radius: 0.6rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px #0002;
+}
+button {
+  padding: 0.5rem 0.8rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: #4055ad;
+  color: white;
+  cursor: pointer;
+}
+.error {
+  color: #a21d2b;
+}
+:focus-visible {
+  outline: 3px solid #a64600;
+  outline-offset: 3px;
+}

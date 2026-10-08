@@ -25,15 +25,17 @@ describe('OrdersService', () => {
     const request = http.expectOne('https://dummyjson.com/carts');
     expect(request.request.method).toBe('GET');
     request.flush({
-      carts: [{
-        id: 1,
-        userId: 2,
-        products: [],
-        total: 50,
-        discountedTotal: 45,
-        totalProducts: 0,
-        totalQuantity: 0,
-      }],
+      carts: [
+        {
+          id: 1,
+          userId: 2,
+          products: [],
+          total: 50,
+          discountedTotal: 45,
+          totalProducts: 0,
+          totalQuantity: 0,
+        },
+      ],
       total: 1,
       skip: 0,
       limit: 30,

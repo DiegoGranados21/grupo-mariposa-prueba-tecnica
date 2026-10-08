@@ -1,12 +1,12 @@
 import 'product.dart';
 
 class ProductPage {
-  const ProductPage({
-    required this.items,
+  ProductPage({
+    required List<Product> items,
     required this.total,
     this.loadingMore = false,
     this.loadMoreError = false,
-  });
+  }) : items = List.unmodifiable(items);
 
   final List<Product> items;
   final int total;

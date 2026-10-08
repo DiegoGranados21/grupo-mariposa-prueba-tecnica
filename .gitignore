@@ -9,6 +9,7 @@ flutter_app/.flutter-plugins-dependencies
 angular_app/node_modules/
 angular_app/dist/
 angular_app/.angular/
+angular_app/coverage/
 
 # Editors and system files
 .idea/
@@ -18,3 +19,6 @@ angular_app/.angular/
 
 # Local verification logs and temporary files
 work/
+
+# Private interview preparation, not part of the public submission
+outputs/

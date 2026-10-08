@@ -4,17 +4,17 @@
 
 1. En Dart, `final` permite asignar un valor una sola vez, incluso si se conoce hasta la ejecución. `const` exige que el valor pueda calcularse en compilación. En Flutter uso `const` cuando los argumentos de un widget también son constantes; así se puede reutilizar esa instancia en lugar de crearla de nuevo.
 
-2. Null safety me obliga a indicar cuándo una variable puede ser nula, por ejemplo `String?`. Con `?.` accedo a ella de forma segura y con `??` defino un valor alternativo. Uso `late` solo si puedo garantizar la inicialización antes de leerla; prefiero evitar `!` cuando puedo comprobar el valor, porque una suposición incorrecta causaría un error en ejecución.
+2. Null safety me obliga a indicar cuándo una variable puede ser nula, por ejemplo `String?`. Con `?.` accedo a ella de forma segura y con `??` defino un valor alternativo. `!` afirma que el valor no es nulo, pero falla si esa suposición es incorrecta. Uso `late` solo si puedo garantizar la inicialización antes de leerla; prefiero comprobar el valor antes que abusar de `!`.
 
 3. Un `StatelessWidget` recibe datos y no administra estado mutable propio. Un `StatefulWidget` tiene un objeto `State`, útil para el ciclo de vida de un controlador de texto, por ejemplo. `ConsumerWidget` permite observar providers con `ref`, y `ConsumerStatefulWidget` combina Riverpod con ese ciclo de vida local.
 
 4. Un `Future` termina con un resultado o un error; lo usaría para consultar un producto por HTTP. Un `Stream` puede emitir varios valores durante su vida, como cambios de ubicación. Elegiría según si necesito una respuesta puntual o actualizaciones continuas.
 
-5. Extraería una parte de la interfaz a una clase de widget cuando tiene una responsabilidad reconocible, recibe datos propios o merece una prueba independiente. Un método `_build...` también puede servir para una sección pequeña; no hace falta crear una clase por cada línea de UI.
+5. Extraería una parte de la interfaz a una clase de widget cuando tiene una responsabilidad reconocible, recibe datos propios o merece una prueba independiente. La clase tiene su propio elemento en el árbol, puede usar un constructor `const` y facilita reutilización y pruebas. Un método `_build...` también puede servir para una sección pequeña; no hace falta crear una clase por cada línea de UI.
 
 6. Riverpod permite separar el estado de la pantalla y sustituir dependencias durante las pruebas. `setState` sigue siendo adecuado para estado local sencillo, como una selección visual; para productos y carrito preferí providers porque varias partes de la app necesitan esos datos. A diferencia de Provider, el acceso no depende de buscar el provider en la posición correcta del árbol de widgets.
 
-7. `ref.watch` observa un provider y actualiza la UI cuando cambia; por eso lo uso al construir widgets. `ref.read` obtiene el notifier para ejecutar una acción desde un callback, como agregar al carrito. `ref.listen` serviría para un efecto puntual, por ejemplo mostrar un aviso, pero no lo necesité en esta app.
+7. `ref.watch` observa un provider y actualiza la UI cuando cambia; por eso lo uso al construir widgets. `ref.read` obtiene el notifier para ejecutar una acción desde un callback, como agregar al carrito. `ref.listen` ejecuta un efecto ante un cambio: en el catálogo sincroniza el controlador del campo de búsqueda con el estado compartido de filtros.
 
 8. Uso `Provider` para exponer una dependencia, como el repositorio; `FutureProvider` para una consulta asíncrona simple, como el detalle; `Notifier` para estado síncrono modificable, como el carrito; y `AsyncNotifier` cuando necesito carga remota junto con acciones como buscar, filtrar o reintentar.
 
@@ -35,6 +35,15 @@ return products.when(
 El fragmento resume la idea; la pantalla entregada también muestra un mensaje de error claro y un botón para reintentar.
 
 11. Para probar un provider, reemplazo `productsRepositoryProvider` por un repositorio falso en un `ProviderContainer` o `ProviderScope`. Así puedo simular datos y errores de forma controlada, sin que la prueba dependa de DummyJSON ni de la conexión a Internet.
+
+```dart
+final container = ProviderContainer(overrides: [
+  productsRepositoryProvider.overrideWithValue(FakeRepository()),
+]);
+addTearDown(container.dispose);
+final page = await container.read(productsProvider.future);
+expect(page.items, isNotEmpty);
+```
 
 12. Un componente standalone declara sus dependencias en `imports` y no necesita declararse en un `NgModule`. Un componente tradicional sí pertenece a un módulo. Elegí standalone porque, para esta aplicación pequeña, deja más claro qué usa cada componente.
 
@@ -64,6 +73,7 @@ El fragmento resume la idea; la pantalla entregada también muestra un mensaje d
 4. **Lectura no reactiva del contador.** Si se usa `ref.read(cartProvider)` para pintarlo, la barra no se reconstruye al cambiar el carrito. Observaría un valor derivado con `ref.watch(cartCountProvider)`.
 5. **Mutación directa del carrito.** `ref.read(cartProvider).add(p)` modifica la lista existente, sin publicar un estado nuevo. La acción debería estar en un `CartNotifier`, que cree una lista nueva y actualice `state`.
 6. **Estados y limpieza.** También faltan una respuesta para error y lista vacía, validación de códigos HTTP y eliminación de impresiones de depuración. Añadiría `const` y `super.key` donde correspondan, pero priorizaría primero el comportamiento y el manejo de errores.
+7. **Ciclo de vida asíncrono.** La petición puede terminar después de abandonar la pantalla y ejecutar `setState` sobre un widget destruido. Al trasladar la carga al provider, la UI deja de administrar ese callback; en operaciones propias también hay que cancelar trabajo o comprobar que el objeto siga activo antes de actualizarlo.
 
 #### Reescritura propuesta (Flutter)
 
@@ -117,3 +127,4 @@ La implementación entregada añade búsqueda, categorías y paginación, que om
 3. **`setInterval` sin limpieza.** Mantiene las consultas periódicas incluso si el componente ya no está. Si el refresco fuera realmente necesario, lo implementaría con un flujo de RxJS y gestionaría su ciclo de vida; en esta prueba no hacía falta consultar cada cinco segundos.
 4. **Estados de la petición.** Una suscripción HTTP individual suele completarse sola, así que no afirmaría que siempre produce una fuga. El problema principal es que el fragmento no muestra carga ni error y deja lógica de suscripción dentro de la pantalla. Preferiría exponer el Observable y consumirlo con `async` pipe.
 5. **Presentación acoplada.** Extraería una tarjeta que reciba un pedido y emita la intención de abrirlo. En la lista usaría `track` y en la tarjeta `OnPush`, porque sus datos llegan por entradas bien definidas.
+6. **Dependencias de la plantilla.** Si el componente es standalone y usa `*ngFor`, debe importar `NgFor` o `CommonModule`; de lo contrario la plantilla no dispone de esa directiva. En la solución uso `@for`, que no requiere importar `NgFor`, con un identificador estable para seguir cada pedido.

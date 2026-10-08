@@ -2,7 +2,14 @@ name: Quality checks
 
 on:
   push:
-  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   flutter:
@@ -16,7 +23,9 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: '3.47.6'
       - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed .
       - run: flutter analyze
       - run: flutter test
 
@@ -31,6 +40,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: '3.47.6'
       - run: flutter config --enable-windows-desktop
       - run: flutter pub get
       - run: flutter test integration_test/catalog_flow_test.dart -d windows
@@ -45,7 +55,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: angular_app/package-lock.json
       - uses: browser-actions/setup-chrome@v1
@@ -57,5 +67,11 @@ jobs:
           chmod +x "$wrapper"
           echo "CHROME_BIN=$wrapper" >> "$GITHUB_ENV"
       - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
       - run: npm run build
       - run: npm test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: angular-coverage
+          path: angular_app/coverage/

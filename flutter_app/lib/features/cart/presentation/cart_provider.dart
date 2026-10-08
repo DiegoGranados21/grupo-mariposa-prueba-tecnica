@@ -14,10 +14,11 @@ final cartProvider = NotifierProvider<CartNotifier, List<CartItem>>(
 
 class CartNotifier extends Notifier<List<CartItem>> {
   @override
-  List<CartItem> build() => ref.read(cartStorageProvider).load();
+  List<CartItem> build() =>
+      List.unmodifiable(ref.read(cartStorageProvider).load());
 
   void _setItems(List<CartItem> items) {
-    state = items;
+    state = List.unmodifiable(items);
     unawaited(ref.read(cartStorageProvider).save(items));
   }
 

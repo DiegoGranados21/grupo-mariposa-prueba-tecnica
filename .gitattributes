@@ -1,0 +1,2 @@
+# Keep checkout and CI formatting consistent on Windows, macOS and Linux.
+* text=auto eol=lf
