@@ -70,6 +70,21 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Carrito'), findsOneWidget);
     expect(find.text('\$25.00'), findsOneWidget);
+    await tester.enterText(find.byKey(const ValueKey('quantity-1')), '50');
+    await tester.pumpAndSettle();
+    expect(find.text('\$1,250.00'), findsOneWidget);
+    expect(find.byTooltip('Carrito (50)'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Detalle'), findsOneWidget);
+    expect(find.byTooltip('Carrito (50)'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      'Producto',
+    );
+    expect(find.byTooltip('Carrito (50)'), findsOneWidget);
   });
 
   testWidgets('persists the cart across storage instances', (tester) async {

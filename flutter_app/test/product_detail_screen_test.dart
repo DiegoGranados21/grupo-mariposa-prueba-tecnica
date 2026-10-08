@@ -18,7 +18,41 @@ class RecoveringRepository extends FakeRepository {
   }
 }
 
+class LongDescriptionRepository extends FakeRepository {
+  @override
+  Future<Product> getProduct(int id) async => Product(
+    id: id,
+    title: 'Long product',
+    price: 10,
+    rating: 4,
+    thumbnail: '',
+    description: List.filled(100, 'Descripción del producto.').join(' '),
+  );
+}
+
 void main() {
+  testWidgets('long details scroll without overflowing a small viewport', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 480);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          productsRepositoryProvider.overrideWithValue(
+            LongDescriptionRepository(),
+          ),
+        ],
+        child: const MaterialApp(home: ProductDetailScreen(id: 1)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Agregar al carrito'), 300);
+    expect(find.text('Agregar al carrito'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('detail displays a typed error and retries the same product', (
     tester,
   ) async {

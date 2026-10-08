@@ -7,19 +7,22 @@ import 'features/cart/presentation/cart_screen.dart';
 import 'features/products/presentation/product_detail_screen.dart';
 import 'features/products/presentation/products_screen.dart';
 
-final routerProvider = Provider<GoRouter>(
-  (ref) => GoRouter(
+final routerProvider = Provider<GoRouter>((ref) {
+  final router = GoRouter(
     routes: [
       GoRoute(path: '/', builder: (_, __) => const ProductsScreen()),
       GoRoute(
         path: '/products/:id',
-        builder: (_, state) =>
-            ProductDetailScreen(id: int.parse(state.pathParameters['id']!)),
+        builder: (_, state) => ProductDetailScreen(
+          id: int.tryParse(state.pathParameters['id'] ?? '') ?? -1,
+        ),
       ),
       GoRoute(path: '/cart', builder: (_, __) => const CartScreen()),
     ],
-  ),
-);
+  );
+  ref.onDispose(router.dispose);
+  return router;
+});
 
 class CatalogApp extends ConsumerWidget {
   const CatalogApp({super.key});

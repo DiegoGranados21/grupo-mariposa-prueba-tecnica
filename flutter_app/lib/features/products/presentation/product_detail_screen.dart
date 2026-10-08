@@ -35,42 +35,44 @@ class ProductDetailScreen extends ConsumerWidget {
             ],
           ),
         ),
-        data: (item) => Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (item.thumbnail.isNotEmpty)
-                Center(
-                  child: Image.network(
-                    item.thumbnail,
-                    height: 180,
-                    semanticLabel: 'Imagen de ${item.title}',
-                    errorBuilder: (_, __, ___) =>
-                        const Icon(Icons.image_not_supported, size: 80),
+        data: (item) => SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (item.thumbnail.isNotEmpty)
+                  Center(
+                    child: Image.network(
+                      item.thumbnail,
+                      height: 180,
+                      semanticLabel: 'Imagen de ${item.title}',
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.image_not_supported, size: 80),
+                    ),
+                  ),
+                const SizedBox(height: 16),
+                Text(
+                  item.title,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                Text('\$${item.price.toStringAsFixed(2)} · ★ ${item.rating}'),
+                const SizedBox(height: 16),
+                Text(item.description),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      ref.read(cartProvider.notifier).add(item);
+                      showCartFeedback(context, item.title);
+                    },
+                    icon: const Icon(Icons.add_shopping_cart),
+                    label: const Text('Agregar al carrito'),
                   ),
                 ),
-              const SizedBox(height: 16),
-              Text(
-                item.title,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              Text('\$${item.price.toStringAsFixed(2)} · ★ ${item.rating}'),
-              const SizedBox(height: 16),
-              Text(item.description),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: () {
-                    ref.read(cartProvider.notifier).add(item);
-                    showCartFeedback(context, item.title);
-                  },
-                  icon: const Icon(Icons.add_shopping_cart),
-                  label: const Text('Agregar al carrito'),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

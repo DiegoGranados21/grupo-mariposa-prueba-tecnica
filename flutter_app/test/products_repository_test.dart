@@ -8,6 +8,21 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 void main() {
+  test('maps a connection error to NetworkFailure', () async {
+    final repository = HttpProductsRepository(
+      client: MockClient((_) async => throw http.ClientException('Offline')),
+    );
+    addTearDown(repository.close);
+    await expectLater(repository.getProducts(), throwsA(isA<NetworkFailure>()));
+  });
+
+  test('maps malformed JSON to DataFailure', () async {
+    final repository = HttpProductsRepository(
+      client: MockClient((_) async => http.Response('invalid json', 200)),
+    );
+    addTearDown(repository.close);
+    await expectLater(repository.getProducts(), throwsA(isA<DataFailure>()));
+  });
   test(
     'combines search and category before paginating the matching products',
     () async {

@@ -54,12 +54,11 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
         title: Text(isCompact ? 'Catálogo' : 'Mini Catálogo'),
         actions: [
           const CartAppBarAction(),
-          if (!isCompact)
-            IconButton(
-              tooltip: 'Cambiar tema',
-              onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
-              icon: const Icon(Icons.brightness_6),
-            ),
+          IconButton(
+            tooltip: 'Cambiar tema',
+            onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
+            icon: const Icon(Icons.brightness_6),
+          ),
         ],
       ),
       body: Column(
@@ -70,7 +69,8 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
               children: [
                 TextField(
                   controller: _searchController,
-                  onChanged: ref.read(productsProvider.notifier).search,
+                  onChanged: (query) =>
+                      ref.read(productsProvider.notifier).search(query),
                   decoration: const InputDecoration(
                     labelText: 'Buscar productos',
                     prefixIcon: Icon(Icons.search),

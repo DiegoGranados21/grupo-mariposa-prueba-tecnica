@@ -47,6 +47,27 @@ class PagedRepository implements ProductsRepository {
 }
 
 void main() {
+  test('a late initial response cannot replace a completed search', () {
+    fakeAsync((async) {
+      final repository = PagedRepository();
+      repository.pending[''] = Completer<ProductPage>();
+      final container = ProviderContainer(
+        overrides: [productsRepositoryProvider.overrideWithValue(repository)],
+      );
+      final notifier = container.read(productsProvider.notifier);
+      notifier.search('phone');
+      async.elapse(const Duration(milliseconds: 400));
+      async.flushMicrotasks();
+      expect(container.read(productsProvider).requireValue.items.single.id, 1);
+      repository.pending['']!.complete(
+        ProductPage(items: [repository._product(99)], total: 1),
+      );
+      async.flushMicrotasks();
+      expect(container.read(productsProvider).requireValue.items.single.id, 1);
+      container.dispose();
+    });
+  });
+
   test('search and category share one state and remain combined', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);

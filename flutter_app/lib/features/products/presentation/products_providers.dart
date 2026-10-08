@@ -35,7 +35,7 @@ class ProductsNotifier extends AsyncNotifier<ProductPage> {
   bool _disposed = false;
 
   @override
-  Future<ProductPage> build() {
+  Future<ProductPage> build() async {
     _disposed = false;
     ref.onDispose(() {
       _disposed = true;
@@ -43,9 +43,21 @@ class ProductsNotifier extends AsyncNotifier<ProductPage> {
       _debounce?.cancel();
     });
     final filters = ref.read(catalogFiltersProvider);
-    return ref
-        .watch(productsRepositoryProvider)
-        .getProducts(query: filters.query.trim(), category: filters.category);
+    final repository = ref.watch(productsRepositoryProvider);
+    final generation = ++_generation;
+    try {
+      final page = await repository.getProducts(
+        query: filters.query.trim(),
+        category: filters.category,
+      );
+      // Si el usuario ya cambió filtros, la carga inicial debe seguir el
+      // resultado vigente, no sobrescribirlo al terminar más tarde.
+      if (!_disposed && generation != _generation) return await future;
+      return page;
+    } on Object {
+      if (!_disposed && generation != _generation) return future;
+      rethrow;
+    }
   }
 
   void search(String query) {
