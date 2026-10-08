@@ -7,9 +7,11 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme_provider.dart';
 import '../../cart/presentation/cart_app_bar_action.dart';
 import '../../cart/presentation/cart_provider.dart';
+import '../../cart/presentation/cart_feedback.dart';
 import '../domain/catalog_failure.dart';
 import '../domain/product_page.dart';
 import 'products_providers.dart';
+import 'catalog_filters.dart';
 
 class ProductsScreen extends ConsumerStatefulWidget {
   const ProductsScreen({super.key});
@@ -19,8 +21,15 @@ class ProductsScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductsScreenState extends ConsumerState<ProductsScreen> {
-  final _searchController = TextEditingController();
-  String _category = '';
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(
+      text: ref.read(catalogFiltersProvider).query,
+    );
+  }
 
   @override
   void dispose() {
@@ -32,6 +41,12 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   Widget build(BuildContext context) {
     final products = ref.watch(productsProvider);
     final categories = ref.watch(categoriesProvider);
+    final filters = ref.watch(catalogFiltersProvider);
+    ref.listen(catalogFiltersProvider, (_, next) {
+      if (_searchController.text != next.query) {
+        _searchController.text = next.query;
+      }
+    });
     final isCompact = MediaQuery.sizeOf(context).width < 600;
 
     return Scaffold(
@@ -55,10 +70,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
               children: [
                 TextField(
                   controller: _searchController,
-                  onChanged: (query) {
-                    if (_category.isNotEmpty) setState(() => _category = '');
-                    ref.read(productsProvider.notifier).search(query);
-                  },
+                  onChanged: ref.read(productsProvider.notifier).search,
                   decoration: const InputDecoration(
                     labelText: 'Buscar productos',
                     prefixIcon: Icon(Icons.search),
@@ -73,8 +85,8 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                     child: const Text('Reintentar categorías'),
                   ),
                   data: (values) => DropdownButtonFormField<String>(
-                    key: ValueKey(_category),
-                    initialValue: _category,
+                    key: ValueKey(filters.category),
+                    initialValue: filters.category,
                     decoration: const InputDecoration(
                       labelText: 'Categoría',
                       border: OutlineInputBorder(),
@@ -86,8 +98,6 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                     ],
                     onChanged: (category) {
                       if (category == null) return;
-                      _searchController.clear();
-                      setState(() => _category = category);
                       ref
                           .read(productsProvider.notifier)
                           .selectCategory(category);
@@ -97,8 +107,24 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
               ],
             ),
           ),
+          if (products.isLoading && products.hasValue)
+            const LinearProgressIndicator(
+              semanticsLabel: 'Actualizando productos',
+            ),
+          if (products.hasError && products.hasValue)
+            MaterialBanner(
+              content: Text('${products.error}'),
+              actions: [
+                TextButton(
+                  onPressed: () => ref.read(productsProvider.notifier).retry(),
+                  child: const Text('Reintentar'),
+                ),
+              ],
+            ),
           Expanded(
             child: products.when(
+              skipLoadingOnReload: true,
+              skipError: products.hasValue,
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, _) => Center(
                 child: Column(
@@ -140,6 +166,8 @@ class _ProductList extends ConsumerWidget {
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
         if (notification.metrics.extentAfter < 250 &&
+            !ref.read(productsProvider).isLoading &&
+            !ref.read(productsProvider).hasError &&
             page.hasMore &&
             !page.loadingMore &&
             !page.loadMoreError) {
@@ -177,6 +205,7 @@ class _ProductList extends ConsumerWidget {
                 ? const Icon(Icons.image_not_supported)
                 : Image.network(
                     product.thumbnail,
+                    semanticLabel: 'Imagen de ${product.title}',
                     width: 56,
                     errorBuilder: (_, __, ___) =>
                         const Icon(Icons.image_not_supported),
@@ -190,7 +219,10 @@ class _ProductList extends ConsumerWidget {
             trailing: IconButton(
               tooltip: 'Agregar ${product.title} al carrito',
               icon: const Icon(Icons.add_shopping_cart),
-              onPressed: () => ref.read(cartProvider.notifier).add(product),
+              onPressed: () {
+                ref.read(cartProvider.notifier).add(product);
+                showCartFeedback(context, product.title);
+              },
             ),
           );
         },

@@ -18,3 +18,12 @@ class ServerFailure extends CatalogFailure {
 class DataFailure extends CatalogFailure {
   const DataFailure() : super('La respuesta del catálogo no es válida.');
 }
+
+class NotFoundFailure extends CatalogFailure {
+  const NotFoundFailure() : super('No se encontró el producto solicitado.');
+}
+
+class TimeoutFailure extends CatalogFailure {
+  const TimeoutFailure()
+    : super('La consulta tardó demasiado. Intenta de nuevo.');
+}
