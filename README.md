@@ -5,6 +5,33 @@ Este repositorio contiene dos implementaciones pequeñas que consumen DummyJSON:
 - `flutter_app/`: mini catálogo de productos con búsqueda, detalle y carrito local.
 - `angular_app/`: panel de pedidos que muestra los carritos disponibles.
 
+## Inicio rápido para el evaluador
+
+Instala Git, Flutter **3.47.6**, Node **22.17.0** (o un Node 22 compatible) y Chrome. No se necesita backend propio, API key ni base de datos. Ambos proyectos consultan DummyJSON por Internet.
+
+```bash
+git clone https://github.com/DiegoGranados21/grupo-mariposa-prueba-tecnica.git
+cd grupo-mariposa-prueba-tecnica
+```
+
+En una terminal, desde la raíz:
+
+```bash
+cd flutter_app
+flutter pub get
+flutter run -d chrome
+```
+
+En otra terminal, desde la raíz:
+
+```bash
+cd angular_app
+npm ci
+npm start
+```
+
+Angular se abre en `http://localhost:4200`. Mantén las terminales activas y usa `Ctrl+C` para detener los servidores. Los pasos de verificación y las alternativas de plataforma se explican abajo. La matriz punto por punto y un recorrido de evaluación están en `VALIDACION_RUBRICA.md`.
+
 ## Decisiones de arquitectura
 
 ### Flutter
@@ -89,7 +116,7 @@ Estos enlaces locales solo funcionan en el equipo que ejecuta el servidor. Un en
 
 ## Checklist de entrega
 
-Verificación local (8 de octubre de 2026): `flutter analyze` sin incidencias y **18 pruebas Flutter** (15 unitarias y 3 de widgets). Angular: formato, lint y build correctos, **9 pruebas en 5 archivos spec**. La integración Windows se ejecuta por separado (2 casos). La cobertura Angular reportada corresponde a los archivos instrumentados por esa ejecución, no a una certificación de cobertura total del sistema.
+Verificación local (8 de octubre de 2026): `flutter analyze` sin incidencias y **29 pruebas Flutter** (22 unitarias y 7 de widgets). Angular: formato, lint y build correctos, **12 pruebas en 6 archivos spec**, incluyendo navegación con rutas reales. La integración Windows se ejecuta por separado (2 casos). La cobertura Angular reportada corresponde a los archivos instrumentados por esa ejecución, no a una certificación de cobertura total del sistema.
 
 - [x] Productos: carga, error, vacío, búsqueda, detalle y carrito.
 - [x] Riverpod con `AsyncNotifier`, `Notifier`, `family` y repositorio inyectable.
