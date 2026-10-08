@@ -1,4 +1,4 @@
-package com.example.grupo_mariposa_catalog
+package dev.diegogranados.mariposacatalog
 
 import io.flutter.embedding.android.FlutterActivity
 
