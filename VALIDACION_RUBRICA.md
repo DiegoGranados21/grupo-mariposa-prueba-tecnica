@@ -12,7 +12,7 @@ Referencia: PDF original de siete páginas, fechado 5 de octubre de 2026. Esta m
 | Code review Flutter | Parte 4: problema, impacto y solución para petición en build, responsabilidades, tipado, lectura no reactiva, mutación, estados y ciclo de vida. Reescritura Flutter incluida. |
 | Code review Angular | Parte 4: HTTP en componente, any, intervalo sin limpieza, suscripciones/estados, acoplamiento y dependencia NgFor faltante. |
 | Historial real | Commits por cambios incrementales; no se reescribe el historial. |
-| Repositorio público actualizado | El repositorio existe, pero los cambios de esta revisión permanecen en la rama local hasta autorización para publicar. No confundir comprobaciones locales con CI remoto aprobado. |
+| Repositorio público | `DiegoGranados21/grupo-mariposa-prueba-tecnica`. La revisión se entrega mediante una rama y un pull request; GitHub Actions permite consultar el resultado de las comprobaciones del commit publicado. |
 
 ## Flutter: nueve requisitos indispensables
 
