@@ -14,7 +14,7 @@
 
 6. Riverpod permite separar el estado de la pantalla y sustituir dependencias durante las pruebas. `setState` sigue siendo adecuado para estado local sencillo, como una selección visual; para productos y carrito preferí providers porque varias partes de la app necesitan esos datos. A diferencia de Provider, el acceso no depende de buscar el provider en la posición correcta del árbol de widgets.
 
-7. `ref.watch` observa un provider y actualiza la UI cuando cambia; por eso lo uso al construir widgets. `ref.read` obtiene el notifier para ejecutar una acción desde un callback, como agregar al carrito. `ref.listen` serviría para un efecto puntual, por ejemplo mostrar un aviso, pero no lo necesité en esta app.
+7. `ref.watch` observa un provider y actualiza la UI cuando cambia; por eso lo uso al construir widgets. `ref.read` obtiene el notifier para ejecutar una acción desde un callback, como agregar al carrito. `ref.listen` ejecuta un efecto ante un cambio: en el catálogo sincroniza el controlador del campo de búsqueda con el estado compartido de filtros.
 
 8. Uso `Provider` para exponer una dependencia, como el repositorio; `FutureProvider` para una consulta asíncrona simple, como el detalle; `Notifier` para estado síncrono modificable, como el carrito; y `AsyncNotifier` cuando necesito carga remota junto con acciones como buscar, filtrar o reintentar.
 
@@ -117,3 +117,4 @@ La implementación entregada añade búsqueda, categorías y paginación, que om
 3. **`setInterval` sin limpieza.** Mantiene las consultas periódicas incluso si el componente ya no está. Si el refresco fuera realmente necesario, lo implementaría con un flujo de RxJS y gestionaría su ciclo de vida; en esta prueba no hacía falta consultar cada cinco segundos.
 4. **Estados de la petición.** Una suscripción HTTP individual suele completarse sola, así que no afirmaría que siempre produce una fuga. El problema principal es que el fragmento no muestra carga ni error y deja lógica de suscripción dentro de la pantalla. Preferiría exponer el Observable y consumirlo con `async` pipe.
 5. **Presentación acoplada.** Extraería una tarjeta que reciba un pedido y emita la intención de abrirlo. En la lista usaría `track` y en la tarjeta `OnPush`, porque sus datos llegan por entradas bien definidas.
+6. **Dependencias de la plantilla.** Si el componente es standalone y usa `*ngFor`, debe importar `NgFor` o `CommonModule`; de lo contrario la plantilla no dispone de esa directiva. En la solución uso `@for`, que no requiere importar `NgFor`, con un identificador estable para seguir cada pedido.
