@@ -28,9 +28,9 @@ type OrdersState = {
 
       @if (state$ | async; as state) {
         @if (state.loading) {
-          <p>Cargando pedidos...</p>
+          <p role="status" aria-live="polite">Cargando pedidos...</p>
         } @else if (state.error) {
-          <p class="error">{{ state.error }}</p>
+          <p class="error" role="alert">{{ state.error }}</p>
         } @else {
           <p>{{ filteredOrders().length }} pedidos encontrados</p>
           <section class="orders">
@@ -50,19 +50,16 @@ export class OrdersPageComponent {
   private readonly router = inject(Router);
 
   readonly minimumControl = new FormControl(0, { nonNullable: true });
-  private readonly minimum = toSignal(
-    this.minimumControl.valueChanges.pipe(startWith(0)),
-    { initialValue: 0 },
-  );
+  private readonly minimum = toSignal(this.minimumControl.valueChanges.pipe(startWith(0)), {
+    initialValue: 0,
+  });
 
   readonly state$ = this.ordersService.getOrders().pipe(
-    map(
-      (response): OrdersState => ({
-        loading: false,
-        orders: response.carts,
-        error: null,
-      }),
-    ),
+    map((response): OrdersState => ({
+      loading: false,
+      orders: response.carts,
+      error: null,
+    })),
     startWith({ loading: true, orders: [], error: null } as OrdersState),
     catchError(() =>
       of({
@@ -74,10 +71,9 @@ export class OrdersPageComponent {
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
-  private readonly orders = toSignal(
-    this.state$.pipe(map((state) => state.orders)),
-    { initialValue: [] as Order[] },
-  );
+  private readonly orders = toSignal(this.state$.pipe(map((state) => state.orders)), {
+    initialValue: [] as Order[],
+  });
 
   readonly filteredOrders = computed(() =>
     this.orders().filter((order) => order.total >= this.minimum()),

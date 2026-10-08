@@ -13,9 +13,17 @@ import { DiscountAmountPipe } from './discount-amount.pipe';
     <article class="card">
       <h2>Pedido #{{ order().id }}</h2>
       <p>Usuario: {{ order().userId }} · {{ order().totalProducts }} productos</p>
-      <p>Total: <strong>{{ order().total | currency: 'USD' }}</strong></p>
-      <p>Ahorro: {{ order().total | discountAmount:order().discountedTotal | currency: 'USD' }}</p>
-      <button type="button" (click)="view.emit(order().id)">Ver detalle</button>
+      <p>
+        Total: <strong>{{ order().total | currency: 'USD' }}</strong>
+      </p>
+      <p>Ahorro: {{ order().total | discountAmount: order().discountedTotal | currency: 'USD' }}</p>
+      <button
+        type="button"
+        [attr.aria-label]="'Ver detalle del pedido ' + order().id"
+        (click)="view.emit(order().id)"
+      >
+        Ver detalle
+      </button>
     </article>
   `,
 })

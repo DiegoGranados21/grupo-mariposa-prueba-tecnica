@@ -1,7 +1,7 @@
 import { AsyncPipe, CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { catchError, map, of, startWith, switchMap } from 'rxjs';
 
 import { OrdersService } from '../services/orders.service';
 import { DiscountAmountPipe } from './discount-amount.pipe';
@@ -17,13 +17,17 @@ import { DiscountAmountPipe } from './discount-amount.pipe';
 
       @if (order$ | async; as state) {
         @if (state.error) {
-          <p class="error">No se pudo cargar el pedido.</p>
+          <p class="error" role="alert">No se pudo cargar el pedido.</p>
         } @else {
           @if (state.order; as order) {
             <h1>Pedido #{{ order.id }}</h1>
             <p>Usuario: {{ order.userId }}</p>
-            <p>Total: <strong>{{ order.total | currency: 'USD' }}</strong></p>
-            <p>Ahorro: {{ order.total | discountAmount:order.discountedTotal | currency: 'USD' }}</p>
+            <p>
+              Total: <strong>{{ order.total | currency: 'USD' }}</strong>
+            </p>
+            <p>
+              Ahorro: {{ order.total | discountAmount: order.discountedTotal | currency: 'USD' }}
+            </p>
             <h2>Productos</h2>
             <ul>
               @for (product of order.products; track product.id) {
@@ -31,7 +35,7 @@ import { DiscountAmountPipe } from './discount-amount.pipe';
               }
             </ul>
           } @else {
-            <p>Cargando pedido...</p>
+            <p role="status" aria-live="polite">Cargando pedido...</p>
           }
         }
       }
@@ -44,8 +48,12 @@ export class OrderDetailComponent {
 
   readonly order$ = this.route.paramMap.pipe(
     map((params) => Number(params.get('id'))),
-    switchMap((id) => this.ordersService.getOrder(id)),
-    map((order) => ({ order, error: false })),
-    catchError(() => of({ order: null, error: true })),
+    switchMap((id) =>
+      this.ordersService.getOrder(id).pipe(
+        map((order) => ({ order, error: false })),
+        startWith({ order: null, error: false }),
+        catchError(() => of({ order: null, error: true })),
+      ),
+    ),
   );
 }

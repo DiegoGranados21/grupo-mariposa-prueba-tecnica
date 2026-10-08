@@ -7,9 +7,10 @@ export const appRoutes: Routes = [
   {
     path: 'orders/:id',
     loadComponent: () =>
-      import('./orders/order-detail.component').then(
-        (module) => module.OrderDetailComponent,
-      ),
+      import('./orders/order-detail.component').then((module) => module.OrderDetailComponent),
   },
-  { path: '**', redirectTo: '' },
+  {
+    path: '**',
+    loadComponent: () => import('./not-found.component').then((module) => module.NotFoundComponent),
+  },
 ];
